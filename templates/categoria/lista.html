@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+
+{% block titulo %} Produtos {% endblock %}
+<p>Data atual formatada: {{ data_atual|date:"d/m/Y H:i:s" }}</p>
+
+
+{% block cards %}    {% endblock %}#3
+
+{% block titulo_page %} Listagem de Produtos {% endblock %}
+
+{% block conteudo %}
+
+    <a href="#" class="btn btn-primary">Cadastrar novo produto</a>
+    <hr>
+
+    <table class="table table-bordered table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Código</th>
+                <th scope="col">Descrição</th>
+                <th scope="col">Ordem</th>
+                <th scope="col">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in lista %}
+            <tr>
+                <td> {{item.id}}</td>
+                <td> {{item.nome}}</td>
+                <td>{{item.ordem}}</td>
+                <td><a href="#" class=" btn btn-info">Detalhes</a>
+                    <a href="#" class=" btn btn-warning">Editar</a>                    
+                    <a href="#" 
+   class="btn btn-danger" 
+   onclick="confirmarExclusao(event, this.href);">
+   Excluir
+</a>
+
+            </tr>
+            {% endfor %}
+          
+        </tbody>
+    </table>
+    <script>
+        function confirmarExclusao(event, url) {
+            if (!confirm('Tem certeza que deseja excluir este produto?')) {
+                event.preventDefault(); // Cancela a navegação
+            }
+        }
+        </script>
+        
+    
+
+
+
+{% endblock %}
