@@ -1,53 +1,69 @@
 {% extends "base.html" %}
 
-
 {% block titulo %} Produtos {% endblock %}
 <p>Data atual formatada: {{ data_atual|date:"d/m/Y H:i:s" }}</p>
 
-
-{% block cards %}    {% endblock %}#3
+{% block cards %}    {% endblock %}
 
 {% block titulo_page %} Listagem de Produtos {% endblock %}
 
 {% block conteudo %}
 
 <a href="{% url 'formulario' %}" class="btn btn-primary">Cadastrar novo produto</a>
-    <hr>
+<a href="{% url 'categoria' %}" class="btn btn-secondary">Recarregar página</a>
+<hr>
 
-    <table class="table table-bordered table-hover">
-        <thead class="thead-dark">
-            <tr>
-                <th scope="col">Código</th>
-                <th scope="col">Descrição</th>
-                <th scope="col">Ordem</th>
-                <th scope="col">Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in lista %}
-            <tr>
-                <td> {{item.id}}</td>
-                <td> {{item.nome}}</td>
-                <td>{{item.ordem}}</td>
-                <td><a href="#" class=" btn btn-info">Detalhes</a>
-                    <a href="#" class=" btn btn-warning">Editar</a>                    
-                    <a href="#" class="btn btn-danger" onclick="confirmarExclusao(event, this.href);">Excluir</a>
+<table class="table table-bordered table-hover">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">Código</th>
+            <th scope="col">Descrição</th>
+            <th scope="col">Ordem</th>
+            <th scope="col">Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in lista %}
+        <tr>
+            <td> {{item.id}}</td>
+            <td> {{item.nome}}</td>
+            <td>{{item.ordem}}</td>
+            <td>
+                <a href="{% url 'detalhes_categoria' id=item.id %}" class="btn btn-info">Detalhes</a>
+                <a href="{% url 'editar_categoria' id=item.id %}" class="btn btn-warning">Editar</a>                   
+                <a href="#" class="btn btn-danger" onclick="confirmarExclusao(event, '{{ item.id }}'); return false;">Excluir</a>
+            </td>
+        </tr>
+        {% endfor %}
+      
+    </tbody>
+</table>
 
-            </tr>
-            {% endfor %}
-          
-        </tbody>
-    </table>
-    <script>
-        function confirmarExclusao(event, url) {
-            if (!confirm('Tem certeza que deseja excluir este produto?')) {
-                event.preventDefault(); // Cancela a navegação
-            }
+<script>
+    function confirmarExclusao(event, id) {
+        if (confirm('Tem certeza que deseja excluir este produto?')) {
+            // Realiza a requisição AJAX para excluir o item
+            fetch(`/categoria/remover/${id}/`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',  // Envio do CSRF token corretamente
+                    'Content-Type': 'application/json',  // Garantir que o Django receba o tipo correto
+                },
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Se a exclusão foi bem-sucedida, removemos a linha da tabela
+                    event.target.closest('tr').remove();  // Remove a linha do produto da tabela
+                } else {
+                    alert('Erro ao excluir o produto!');
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('Ocorreu um erro ao excluir o produto!');
+            });
         }
-        </script>
-        
-    
-
-
+    }
+</script>
 
 {% endblock %}
