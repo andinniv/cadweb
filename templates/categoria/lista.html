@@ -7,6 +7,14 @@
 
 {% block titulo_page %} Listagem de Produtos {% endblock %}
 
+{% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li class="{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
 {% block conteudo %}
 
 <a href="{% url 'formulario' %}" class="btn btn-primary">Cadastrar novo produto</a>
@@ -28,10 +36,13 @@
             <td> {{item.id}}</td>
             <td> {{item.nome}}</td>
             <td>{{item.ordem}}</td>
-            <td>
+            <td style="display: flex; gap: 5px;">
                 <a href="{% url 'detalhes_categoria' id=item.id %}" class="btn btn-info">Detalhes</a>
                 <a href="{% url 'editar_categoria' id=item.id %}" class="btn btn-warning">Editar</a>                   
-                <a href="#" class="btn btn-danger" onclick="confirmarExclusao(event, '{{ item.id }}'); return false;">Excluir</a>
+                <form method="post" action="{% url 'remover_categoria' item.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Excluir</button>
+                </form>
             </td>
         </tr>
         {% endfor %}
@@ -40,30 +51,13 @@
 </table>
 
 <script>
-    function confirmarExclusao(event, id) {
-        if (confirm('Tem certeza que deseja excluir este produto?')) {
-            // Realiza a requisição AJAX para excluir o item
-            fetch(`/categoria/remover/${id}/`, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRFToken': '{{ csrf_token }}',  // Envio do CSRF token corretamente
-                    'Content-Type': 'application/json',  // Garantir que o Django receba o tipo correto
-                },
-            })
-            .then(response => {
-                if (response.ok) {
-                    // Se a exclusão foi bem-sucedida, removemos a linha da tabela
-                    event.target.closest('tr').remove();  // Remove a linha do produto da tabela
-                } else {
-                    alert('Erro ao excluir o produto!');
-                }
-            })
-            .catch(error => {
-                console.error('Erro:', error);
-                alert('Ocorreu um erro ao excluir o produto!');
-            });
-        }
-    }
+    document.querySelectorAll('form').forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!confirm('Tem certeza que deseja excluir esta categoria?')) {
+                event.preventDefault(); // Impede o envio do formulário
+            }
+        });
+    });
 </script>
 
 {% endblock %}
