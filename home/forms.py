@@ -106,3 +106,4 @@ class EstoqueForm(forms.ModelForm):
         if qtde < 0:
             raise forms.ValidationError("O valor de quantidade não pode ser negativo.")
         return qtde
+    

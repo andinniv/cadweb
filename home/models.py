@@ -25,16 +25,22 @@ class Cliente(models.Model):
 class Produto(models.Model):
     nome = models.CharField(max_length=100)
     preco = models.DecimalField(max_digits=10, decimal_places=2)
-    categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE)
+    categoria = models.ForeignKey('Categoria', on_delete=models.CASCADE)
     img_base64 = models.TextField(blank=True)
 
     def __str__(self):
         return self.nome
-    
-class Estoque(models.Model):
-    produto = models.ForeignKey(Produto, on_delete=models.CASCADE)
-    qtde = models.IntegerField()
 
+    @property
+    def estoque(self):
+        # Garante que um estoque esteja associado ao produto
+        estoque_item, created = Estoque.objects.get_or_create(produto=self, defaults={'qtde': 0})
+        return estoque_item
+
+
+class Estoque(models.Model):
+    produto = models.OneToOneField(Produto, on_delete=models.CASCADE)  # Troque para OneToOne se cada produto tiver um estoque único
+    qtde = models.IntegerField()
 
     def __str__(self):
         return f'{self.produto.nome} - Quantidade: {self.qtde}'

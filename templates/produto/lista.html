@@ -25,7 +25,7 @@
     {% for produto in lista %}
       <tr>
         <td>{{ produto.id }}</td>
-        <td><img src="{{ produto.img_base64 }}" class="img-fluid"></td>
+        <td><img src="{{ produto.img_base64 }}" class="img-fluid" style="height: 35px;width: 30px;"></td>
         <td>{{ produto.nome }}</td>
         <td>{{ produto.preco }}</td>
         <td>{{ produto.categoria }}</td>
