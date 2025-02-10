@@ -5,9 +5,38 @@
 {% block conteudo %} 
 
 <div class="barrabotoes">
-<button onClick="location='{% url "form_produto" %}'" type="button" class="btn btn-primary ">Inserir Novo</button>
-<button onClick="location='{% url "produto" %}'" type="button" class="btn btn-secondary ">Recarregar</button>
+<button onClick="location='{% url "form_produto" %}'" type="button" class="btn btn-primary btn-sm">Inserir Novo</button>
+<button onClick="location='{% url "produto" %}'" type="button" class="btn btn-primary btn-sm">Recarregar</button>
 </div>
+
+<style>
+  .table-hover tbody tr {
+    height: 60px; /* Define a altura das linhas */
+  }
+  .table-hover img {
+    max-width: 50px;
+    max-height: 50px;
+  }
+  .table-hover td, .table-hover th {
+    vertical-align: middle; /* Alinha verticalmente */
+    text-align: center; /* Centraliza o texto */
+  }
+  .table-hover td:last-child {
+    display: flex;
+    flex-direction: row; /* Empilha os botões verticalmente */
+    justify-content: center;
+    align-items: center;
+    gap: 10px; /* Espaçamento entre os botões */
+  }
+  .table-hover td:last-child button,
+  .table-hover td:last-child a,
+  .table-hover td:last-child form {
+    margin: 10px 0; /* Adiciona 10px de margem acima e abaixo */
+    display: flex;
+    align-items: center; /* Centraliza o conteúdo do botão */
+    height: 40px; /* Define um tamanho uniforme para os botões */
+  }
+</style>
 
 <table class="table table-hover">
     <thead>
@@ -25,7 +54,7 @@
     {% for produto in lista %}
       <tr>
         <td>{{ produto.id }}</td>
-        <td><img src="{{ produto.img_base64 }}" class="img-fluid" style="height: 35px;width: 30px;"></td>
+        <td><img src="{{ produto.img_base64 }}" class="img-fluid"></td>
         <td>{{ produto.nome }}</td>
         <td>{{ produto.preco }}</td>
         <td>{{ produto.categoria }}</td>

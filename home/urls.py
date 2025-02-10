@@ -15,7 +15,7 @@ urlpatterns = [
     path('cliente/form_cliente/', views.form_cliente, name="form_cliente"),
     path('cliente/detalhes/<int:id>/', views.detalhes_cliente, name="detalhes_cliente"),
     path('editar_cliente/<int:id>/', views.editar_cliente, name="editar_cliente"),
-    path('cliente/excluir/<int:id>/', views.excluir_cliente, name='excluir_cliente'),    
+    path('remover_cliente/<int:id>/', views.remover_cliente, name='remover_cliente'),    
 
 
 ######################################### PRODUTO ################################################
@@ -37,4 +37,10 @@ urlpatterns = [
 
 ###################################### PEDIDO #####################################################
     path('pedido/', views.pedido, name='pedido'),
+    path('pedido/novo_pedido/<int:id>', views.novo_pedido, name='novo_pedido'),
+    path('pedido/detalhes/<int:id>/', views.detalhes_pedido, name='detalhes_pedido'),
+    path('editar_pedido/<int:id>/', views.editar_pedido, name='editar_pedido'),
+    path('remover_pedido/<int:id>/', views.remover_pedido, name='remover_pedido'),
+    path('remover_item_pedido/<int:id>/', views.remover_item_pedido, name='remover_item_pedido'),
+    path('editar_item_pedido/<int:id>/', views.editar_item_pedido, name='editar_item_pedido'),
     ]

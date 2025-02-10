@@ -64,7 +64,6 @@ class ProdutoForm(forms.ModelForm):
         model = Produto
         fields = ['nome', 'preco', 'categoria','img_base64']
         widgets = {
-            #'categoria': forms.Select(attrs={'class': 'form-control'}),
             'categoria': forms.HiddenInput(),
             'nome':forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nome'}),
             'img_base64': forms.HiddenInput(), 
@@ -86,34 +85,41 @@ class ProdutoForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ProdutoForm, self).__init__(*args, **kwargs)
         self.fields['preco'].localize = True
-        self.fields['preco'].widget.is_localized = True 
+        self.fields['preco'].widget.is_localized = True  
 
 class EstoqueForm(forms.ModelForm):
-    class Meta:
-        model = Estoque
-        fields = ['produto', 'qtde']
+     class Meta:
+          model = Estoque
+          fields = ['produto', 'qtde']
 
-        widgets = {
-            'produto': forms.HiddenInput(),
-            'qtde': forms.NumberInput(attrs={
-                'class': 'inteiro form-control',
-                'min': 0,  # Evita valores negativos no navegador
-                'placeholder': 'Digite a quantidade',
-            }),
-        }
+          widgets = {
+               'produto': forms.HiddenInput(),
+               'qtde': forms.TextInput(attrs={'class': 'inteiro form-control',}),
+          }  
 
-    def clean_qtde(self):
-        qtde = self.cleaned_data.get('qtde')
-        if qtde < 0:
-            raise forms.ValidationError("O valor de quantidade não pode ser negativo.")
-        return qtde
-    
 class PedidoForm(forms.ModelForm):
-    class Meta:
-        model = Pedido
-        fields = ['cliente']
-        widgets = {
-            'cliente': forms.HiddenInput(),  # Campo oculto para armazenar o ID
-        }
+     class Meta:
+          model = Pedido
+          fields = ['cliente']
+          widgets = {
+               'cliente': forms.HiddenInput(),
+          }
 
-    
+
+
+class ItemPedidoForm(forms.ModelForm):
+     class Meta:
+          model = ItemPedido
+          fields = ['pedido', 'produto', 'qtde']
+
+          widgets = {
+               'pedido': forms.HiddenInput(),
+               'produto': forms.HiddenInput(),
+               'qtde': forms.TextInput(attrs={'class': 'inteiro form-control',}),
+          }
+     
+     def clean_qtde(self):
+        qtde = self.cleaned_data.get('qtde')
+        if not isinstance(qtde, int) or qtde < 0:
+            raise forms.ValidationError('A quantidade deve ser um número inteiro positivo.')
+        return qtde
