@@ -323,7 +323,9 @@ def detalhes_pedido(request, id):
                 item_pedido.produto.estoque.qtde = estoque_atual
                 item_pedido.produto.estoque.save()   # Salvando a atualização do estoque
                 item_pedido.save()  # Salvando o item do pedido
+                estoque_atual.save()
                 print (f'atualizado: {estoque_atual.qtde}')
+                
 
                 messages.success(request, 'Produto adicionado com sucesso!')
                 itemPedido = ItemPedido(pedido=pedido)
