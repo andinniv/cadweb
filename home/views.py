@@ -359,7 +359,7 @@ def editar_pedido(request, id):
     else: 
         form = PedidoForm(instance=pedido)
     
-    return render(request, 'pedido/form.html', {'form':form,})
+    return render(request, 'pedido/detalhes.html', {'form':form,})
 
 @login_required
 def remover_item_pedido(request, id):
