@@ -61,6 +61,9 @@
 
     <hr>
     <p><strong>Total de Pedidos: R$</strong> {{ pedido.total }}</p>
+    <p><strong>Total de Pago: R$</strong> {{ pedido.total_pago }}</p>
+    <p><strong>Débito: R$</strong> {{ pedido.debito }}</p>
+    
     <button type="submit" class="btn btn-secondary" onclick="location.href='{% url 'pedido' %}'">Voltar</button>
 
 

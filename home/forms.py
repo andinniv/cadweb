@@ -123,3 +123,54 @@ class ItemPedidoForm(forms.ModelForm):
         if not isinstance(qtde, int) or qtde < 0:
             raise forms.ValidationError('A quantidade deve ser um número inteiro positivo.')
         return qtde
+
+class PagamentoForm(forms.ModelForm):
+     class Meta:
+          model = Pagamento
+          fields = ['pedido', 'forma', 'valor']
+          widgets = {
+               'pedido': forms.HiddenInput(),
+               'forma': forms.Select(attrs={'class': 'form-control'}),
+               'valor': forms.TextInput(attrs={
+                    'class': 'money form-control',
+                    'maxlenght': '500',
+                    'placeholder': '0.000,00',
+            }),
+         }
+     
+     def __init__(self, *args, **kwargs):
+          super(PagamentoForm, self).__init__(*args, **kwargs)
+          self.fields['valor'].localize = True 
+          self.fields['valor'].widget.is_localized = True 
+
+     
+     def clean_valor(self):
+        valor = self.cleaned_data.get('valor')
+        pedido = self.cleaned_data.get('pedido')
+
+        if valor <= 0:
+            raise forms.ValidationError("O valor deve ser maior que zero.")
+
+        if pedido:
+            debito = pedido.debito  # Obtém o valor do débito do pedido
+            if valor > debito:
+                raise forms.ValidationError("O valor do pagamento não pode ser maior que o débito do pedido.")
+
+        return valor
+
+class NotaFiscalForm(forms.ModelForm):
+    class Meta:
+        model = NotaFiscal
+        exclude = ['data_emissao']  # Exclui o campo do formulário
+        fields = ['pedido', 'chave_acesso', 'data_emissao', 'total_pedido', 'icms', 'ipi', 'pis', 'cofins', 'impostos_totais', 'valor_final']
+        widgets = {
+            'chave_acesso': forms.TextInput(attrs={'readonly': 'readonly'}),
+            'data_emissao': forms.TextInput(attrs={'readonly': 'readonly'}),
+            'total_pedido': forms.TextInput(attrs={'readonly': 'readonly'}),
+            'icms': forms.TextInput(attrs={'readonly': 'readonly'}),
+            'ipi': forms.TextInput(attrs={'readonly': 'readonly'}),
+            'pis': forms.TextInput(attrs={'readonly': 'readonly'}),
+            'cofins': forms.TextInput(attrs={'readonly': 'readonly'}),
+            'impostos_totais': forms.TextInput(attrs={'readonly': 'readonly'}),
+            'valor_final': forms.TextInput(attrs={'readonly': 'readonly'}),
+        }
