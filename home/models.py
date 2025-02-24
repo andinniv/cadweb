@@ -1,6 +1,9 @@
 from django.db import models
 from decimal import Decimal
+from datetime import datetime
 import hashlib
+from django.core.validators import RegexValidator
+from django.utils.timezone import now
 
 class Categoria(models.Model):
     nome = models.CharField(max_length=100)
@@ -65,8 +68,8 @@ class Pedido(models.Model):
     status = models.IntegerField(choices=STATUS_CHOICES, default=NOVO)
 
     def __str__(self):
-            return f"Pedido {self.id} - Cliente: {self.cliente.nome} - Status: {self.get_status_display()}"
-    
+        return f"Pedido {self.id} - Cliente: {self.cliente.nome} - Status: {self.get_status_display()}"
+
     @property
     def data_pedidof(self):
         if self.data_pedido:
@@ -77,27 +80,27 @@ class Pedido(models.Model):
     def total(self):
         """Retorna o total do pedido como Decimal"""
         total = sum(item.qtde * item.preco for item in self.itempedido_set.all())
-        return Decimal(total)  # Certifique-se de que o total seja um Decimal
-    
+        return Decimal(total)  
+
     @property
     def icms(self):
         """ICMS: 18% sobre o total do pedido."""
-        return self.total * Decimal(0.18)  # Usando Decimal para o cálculo
+        return self.total * Decimal(0.18)
 
     @property
     def ipi(self):
         """IPI: 5% sobre o total do pedido."""
-        return self.total * Decimal(0.05)  # Usando Decimal para o cálculo
+        return self.total * Decimal(0.05)
 
     @property
     def pis(self):
         """PIS: 1.65% sobre o total do pedido."""
-        return self.total * Decimal(0.0165)  # Usando Decimal para o cálculo
+        return self.total * Decimal(0.0165)
 
     @property
     def cofins(self):
         """COFINS: 7.6% sobre o total do pedido."""
-        return self.total * Decimal(0.076)  # Usando Decimal para o cálculo
+        return self.total * Decimal(0.076)
 
     @property
     def impostos_totais(self):
@@ -108,11 +111,11 @@ class Pedido(models.Model):
     def valor_final(self):
         """Valor final do pedido considerando os impostos."""
         return self.total + self.impostos_totais
-    
+
     @property
     def qtdeItens(self):
         return self.itempedido_set.count()
-    
+
     @property
     def pagamentos(self):
         return Pagamento.objects.filter(pedido=self)
@@ -120,21 +123,27 @@ class Pedido(models.Model):
     @property
     def total_pago(self):
         total = sum(pagamento.valor for pagamento in self.pagamentos.all())
-        return Decimal(total)  # Certifique-se de que o total_pago seja um Decimal
-    
+        return Decimal(total)  
+
     @property
     def debito(self):
         valor_debito = self.total - self.total_pago 
-        return Decimal(valor_debito)  # Certifique-se de que o débito seja um Decimal
-    
+        return Decimal(valor_debito)  
+
     @property
     def chave_acesso(self):
-        """Gera uma chave de acesso única baseada no ID do pedido e na data do pedido."""
+        """Gera uma chave de acesso única contendo apenas números"""
         if not self.data_pedido or not self.id:
             return None
+        
+        # Criando uma base numérica com ID do pedido e data do pedido no formato YYYYMMDDHHMMSS
         chave_base = f"{self.id}{self.data_pedido.strftime('%Y%m%d%H%M%S')}"
-        chave_hash = hashlib.sha256(chave_base.encode()).hexdigest().upper()
-        return chave_hash[:44]  # Mantém apenas os primeiros 44 caracteres, como no DANFE
+        
+        # Preencher com zeros à esquerda para garantir exatamente 44 caracteres
+        chave_numerica = chave_base.ljust(44, '0')
+
+        # Garantir que tenha exatamente 44 dígitos
+        return chave_numerica[:44]
 
 
 class ItemPedido(models.Model):
