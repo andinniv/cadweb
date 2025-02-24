@@ -1,8 +1,6 @@
+import random
 from django.db import models
 from decimal import Decimal
-from datetime import datetime
-import hashlib
-from django.core.validators import RegexValidator
 from django.utils.timezone import now
 
 class Categoria(models.Model):
@@ -132,19 +130,23 @@ class Pedido(models.Model):
 
     @property
     def chave_acesso(self):
-        """Gera uma chave de acesso única contendo apenas números"""
+        """Gera uma chave de acesso única baseada no ID do pedido e na data do pedido."""
         if not self.data_pedido or not self.id:
             return None
         
-        # Criando uma base numérica com ID do pedido e data do pedido no formato YYYYMMDDHHMMSS
-        chave_base = f"{self.id}{self.data_pedido.strftime('%Y%m%d%H%M%S')}"
+         # Data de emissão no formato YYYYMMDD
+        data_formatada = self.data_pedido.strftime('%Y%m%d')
         
-        # Preencher com zeros à esquerda para garantir exatamente 44 caracteres
-        chave_numerica = chave_base.ljust(44, '0')
-
-        # Garantir que tenha exatamente 44 dígitos
-        return chave_numerica[:44]
-
+        # ID do pedido com no mínimo 6 dígitos (ex: 000123)
+        id_pedido = str(self.id).zfill(6)
+        
+        # Gera números aleatórios para completar até 44 caracteres
+        restante = 44 - (len(data_formatada) + len(id_pedido))
+        numeros_aleatorios = ''.join(str(random.randint(0, 9)) for _ in range(restante))
+        
+        # Monta a chave numérica final
+        chave = f"{data_formatada}{id_pedido}{numeros_aleatorios}"
+        return chave
 
 class ItemPedido(models.Model):
     pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE)    
